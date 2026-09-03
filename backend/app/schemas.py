@@ -130,3 +130,15 @@ class TurnResponse(BaseModel):
     created_at: datetime
 
     model_config = {"from_attributes": True}
+
+class UserPreferenceResponse(BaseModel):
+    login_username: str
+    active_profile_id: Optional[str] = None
+    active_thread_id: Optional[str] = None
+    updated_at: datetime
+
+    model_config = {"from_attributes": True}
+
+class UserPreferenceUpdate(BaseModel):
+    active_profile_id: Optional[str] = None
+    active_thread_id: Optional[str] = None

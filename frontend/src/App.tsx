@@ -57,6 +57,9 @@ export default function App() {
   const [authToken, setAuthToken] = useState<string | null>(() => {
     return localStorage.getItem('dh_auth_token');
   });
+  const [authUsername, setAuthUsername] = useState<string>(() => {
+    return localStorage.getItem('dh_auth_username') || '';
+  });
   const [authDisplayName, setAuthDisplayName] = useState<string>(() => {
     return localStorage.getItem('dh_auth_display_name') || '';
   });
@@ -72,6 +75,7 @@ export default function App() {
   const [activeSessionId, setActiveSessionId] = useState<string>(() => {
     return localStorage.getItem('companion_active_session_id') || 'chat_main_1';
   });
+  const [prefsHydrated, setPrefsHydrated] = useState(false);
   const [isInspectorOpen, setIsInspectorOpen] = useState<boolean>(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState<boolean>(false);
   const [refreshKey, setRefreshKey] = useState<number>(0);
@@ -80,17 +84,21 @@ export default function App() {
   const [newUserRole, setNewUserRole] = useState<string>('');
   const [newUserLocation, setNewUserLocation] = useState<string>('');
 
-  const handleLogin = (token: string, _username: string, displayName: string) => {
+  const handleLogin = (token: string, username: string, displayName: string) => {
     localStorage.setItem('dh_auth_token', token);
+    localStorage.setItem('dh_auth_username', username);
     localStorage.setItem('dh_auth_display_name', displayName);
     setAuthToken(token);
+    setAuthUsername(username);
     setAuthDisplayName(displayName);
   };
 
   const handleLogout = () => {
     localStorage.removeItem('dh_auth_token');
+    localStorage.removeItem('dh_auth_username');
     localStorage.removeItem('dh_auth_display_name');
     setAuthToken(null);
+    setAuthUsername('');
     setAuthDisplayName('');
   };
 
@@ -100,11 +108,23 @@ export default function App() {
   // Persist active profile
   useEffect(() => {
     localStorage.setItem('active_profile_id', activeProfileId);
+    if (!prefsHydrated || !authUsername) return;
+    fetch(`/api/v1/preferences?login_username=${encodeURIComponent(authUsername)}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ active_profile_id: activeProfileId })
+    }).catch(() => {});
   }, [activeProfileId]);
 
-  // Persist active session
+  // Persist active session (local + DB cross-device)
   useEffect(() => {
     localStorage.setItem('companion_active_session_id', activeSessionId);
+    if (!prefsHydrated || !authUsername) return;
+    fetch(`/api/v1/preferences?login_username=${encodeURIComponent(authUsername)}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ active_thread_id: activeSessionId })
+    }).catch(() => {});
   }, [activeSessionId]);
 
   // Fetch threads from DB (per profile)
@@ -160,6 +180,19 @@ export default function App() {
       .catch(() => {
         // fallback to defaults (already set)
       });
+    // also restore cross-device last-opened from DB
+    if (authUsername) {
+      fetch(`/api/v1/preferences?login_username=${encodeURIComponent(authUsername)}`)
+        .then((r) => (r.ok ? r.json() : null))
+        .then((pref) => {
+          if (pref?.active_profile_id) setActiveProfileId(pref.active_profile_id);
+          if (pref?.active_thread_id) setActiveSessionId(pref.active_thread_id);
+        })
+        .catch(() => {})
+        .finally(() => setPrefsHydrated(true));
+    } else {
+      setPrefsHydrated(true);
+    }
   }, [authToken]);
 
   // ─── Auth gate: must be AFTER all hooks (Rules of Hooks) ───────

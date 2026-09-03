@@ -12,7 +12,8 @@ from backend.app.schemas import (
     ChatMessageRequest, ChatMessageResponse, MemoryManageRequest,
     MemoryOperationResponse, MemorySnapshotResponse, FactResponse, TombstoneResponse,
     ProfileCreate, ProfileResponse,
-    ChatThreadCreate, ChatThreadUpdate, ChatThreadResponse, TurnResponse
+    ChatThreadCreate, ChatThreadUpdate, ChatThreadResponse, TurnResponse,
+    UserPreferenceResponse, UserPreferenceUpdate
 )
 from backend.app.services.memory_service import memory_service, MemoryCapacityExceededError
 from backend.app.agent import companion_agent
@@ -238,6 +239,37 @@ async def list_turns(thread_id: str, user_id: str, db: AsyncSession = Depends(ge
     from backend.app.models import Turn
     result = await db.execute(select(Turn).where(Turn.session_id == thread_id, Turn.user_id == user_id).order_by(Turn.turn_index.asc()))
     return result.scalars().all()
+
+# ─── User Preferences (cross-device last-opened sync) ────────────
+@app.get("/api/v1/preferences", response_model=UserPreferenceResponse, tags=["System"])
+async def get_preferences(login_username: str, db: AsyncSession = Depends(get_db)):
+    from sqlalchemy import select
+    from backend.app.models import UserPreference
+    result = await db.execute(select(UserPreference).where(UserPreference.login_username == login_username))
+    pref = result.scalar_one_or_none()
+    if not pref:
+        return UserPreferenceResponse(login_username=login_username, active_profile_id=None, active_thread_id=None, updated_at=__import__('datetime').datetime.utcnow())
+    return pref
+
+@app.put("/api/v1/preferences", response_model=UserPreferenceResponse, tags=["System"])
+async def put_preferences(login_username: str, req: UserPreferenceUpdate, db: AsyncSession = Depends(get_db)):
+    from sqlalchemy import select
+    from backend.app.models import UserPreference
+    from datetime import datetime
+    result = await db.execute(select(UserPreference).where(UserPreference.login_username == login_username))
+    pref = result.scalar_one_or_none()
+    if not pref:
+        pref = UserPreference(login_username=login_username, active_profile_id=req.active_profile_id, active_thread_id=req.active_thread_id)
+        db.add(pref)
+    else:
+        if req.active_profile_id is not None:
+            pref.active_profile_id = req.active_profile_id
+        if req.active_thread_id is not None:
+            pref.active_thread_id = req.active_thread_id
+        pref.updated_at = datetime.utcnow()
+    await db.commit()
+    await db.refresh(pref)
+    return pref
 
 @app.post("/api/v1/chat", response_model=ChatMessageResponse, tags=["Chat"])
 async def chat_sync(req: ChatMessageRequest, db: AsyncSession = Depends(get_db)):

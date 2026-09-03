@@ -84,3 +84,11 @@ class ChatThread(Base):
     __table_args__ = (
         Index("ix_chat_threads_user_updated", "user_id", "updated_at"),
     )
+
+class UserPreference(Base):
+    __tablename__ = "user_preferences"
+
+    login_username = Column(String(64), primary_key=True)
+    active_profile_id = Column(String(64), nullable=True)
+    active_thread_id = Column(String(64), nullable=True)
+    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)

@@ -10,6 +10,7 @@ interface ChatProps {
   onToggleInspector?: () => void;
   isInspectorOpen?: boolean;
   onOpenMenu?: () => void;
+  onUpdateTitle?: (title: string) => void;
 }
 
 export const Chat: React.FC<ChatProps> = ({
@@ -19,7 +20,8 @@ export const Chat: React.FC<ChatProps> = ({
   onMemoryUpdate,
   onToggleInspector,
   isInspectorOpen,
-  onOpenMenu
+  onOpenMenu,
+  onUpdateTitle
 }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -66,6 +68,12 @@ export const Chat: React.FC<ChatProps> = ({
   const handleSend = async (textToSend?: string) => {
     const text = (textToSend || input).trim();
     if (!text || isStreaming) return;
+
+    const isFirstUserMessage = messages.filter((m) => m.role === 'user').length === 0;
+    if (isFirstUserMessage && onUpdateTitle) {
+      const title = text.slice(0, 40) + (text.length > 40 ? '…' : '');
+      onUpdateTitle(title);
+    }
 
     const userMessage: Message = {
       id: `user_${Date.now()}`,

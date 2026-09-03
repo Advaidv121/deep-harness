@@ -84,7 +84,9 @@ export default function App() {
         };
   });
 
-  const [activeSessionId, setActiveSessionId] = useState<string>('chat_main_1');
+  const [activeSessionId, setActiveSessionId] = useState<string>(() => {
+    return localStorage.getItem('companion_active_session_id') || 'chat_main_1';
+  });
   const [isInspectorOpen, setIsInspectorOpen] = useState<boolean>(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState<boolean>(false);
   const [refreshKey, setRefreshKey] = useState<number>(0);
@@ -114,6 +116,19 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem('active_profile_id', activeProfileId);
   }, [activeProfileId]);
+
+  // Persist active session
+  useEffect(() => {
+    localStorage.setItem('companion_active_session_id', activeSessionId);
+  }, [activeSessionId]);
+
+  // Ensure activeSessionId always belongs to the active profile (fixes refresh/switch)
+  useEffect(() => {
+    const list = threads[activeProfileId];
+    if (list && list.length > 0 && !list.some((t) => t.id === activeSessionId)) {
+      setActiveSessionId(list[0].id);
+    }
+  }, [activeProfileId]); // only re-align on profile change, not on every threads change to avoid clobbering new chat
 
   // Persist threads
   useEffect(() => {
@@ -158,7 +173,7 @@ export default function App() {
         [profileId]: [{ id: newSid, title: 'New Conversation', createdAt: 'Just now' }]
       }));
       setActiveSessionId(newSid);
-    } else {
+    } else if (!existingThreads.some((t) => t.id === activeSessionId)) {
       setActiveSessionId(existingThreads[0].id);
     }
     setRefreshKey((k) => k + 1);
@@ -168,7 +183,7 @@ export default function App() {
     const newSid = `session_${Date.now()}`;
     const newThread: ChatThread = {
       id: newSid,
-      title: `Conversation ${profileThreads.length + 1}`,
+      title: 'New Conversation',
       createdAt: 'Just now'
     };
 
@@ -246,6 +261,19 @@ export default function App() {
 
   const handleMemoryUpdate = () => {
     setRefreshKey((prev) => prev + 1);
+  };
+
+  const handleUpdateThreadTitle = (title: string) => {
+    setThreads((prev) => {
+      const list = prev[activeProfile.id] || [];
+      const idx = list.findIndex((t) => t.id === activeSessionId);
+      if (idx === -1) return prev;
+      // Don't overwrite if already named (not New Conversation)
+      if (list[idx].title !== 'New Conversation') return prev;
+      const updated = [...list];
+      updated[idx] = { ...updated[idx], title };
+      return { ...prev, [activeProfile.id]: updated };
+    });
   };
 
   return (
@@ -463,6 +491,7 @@ export default function App() {
             onToggleInspector={() => setIsInspectorOpen(!isInspectorOpen)}
             isInspectorOpen={isInspectorOpen}
             onOpenMenu={() => setMobileSidebarOpen(true)}
+            onUpdateTitle={handleUpdateThreadTitle}
           />
         </div>
       </main>

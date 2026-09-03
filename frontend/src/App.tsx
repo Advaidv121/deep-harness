@@ -67,22 +67,7 @@ export default function App() {
     return localStorage.getItem('active_profile_id') || 'alex_prod';
   });
 
-  const [threads, setThreads] = useState<Record<string, ChatThread[]>>(() => {
-    const saved = localStorage.getItem('companion_threads');
-    return saved
-      ? JSON.parse(saved)
-      : {
-          alex_prod: [
-            { id: 'chat_main_1', title: 'Work Outage & Meditation', createdAt: 'Today' }
-          ],
-          clara_orbital: [
-            { id: 'chat_clara_1', title: 'Orbital Trajectory & Coffee', createdAt: 'Today' }
-          ],
-          maya_architect: [
-            { id: 'chat_maya_1', title: 'Chicago Studio & Kittens', createdAt: 'Today' }
-          ]
-        };
-  });
+  const [threads, setThreads] = useState<Record<string, ChatThread[]>>({});
 
   const [activeSessionId, setActiveSessionId] = useState<string>(() => {
     return localStorage.getItem('companion_active_session_id') || 'chat_main_1';
@@ -122,18 +107,38 @@ export default function App() {
     localStorage.setItem('companion_active_session_id', activeSessionId);
   }, [activeSessionId]);
 
-  // Ensure activeSessionId always belongs to the active profile (fixes refresh/switch)
+  // Fetch threads from DB (per profile)
+  const fetchThreads = async (userId: string) => {
+    try {
+      const res = await fetch(`/api/v1/threads?user_id=${encodeURIComponent(userId)}`);
+      if (res.ok) {
+        const data = await res.json();
+        const mapped: ChatThread[] = data.map((t: any) => ({
+          id: t.id,
+          title: t.title,
+          createdAt: new Date(t.updated_at || t.created_at).toLocaleDateString()
+        }));
+        setThreads((prev) => ({ ...prev, [userId]: mapped }));
+        // align activeSessionId if not in list
+        if (mapped.length > 0 && !mapped.some((m) => m.id === activeSessionId) && userId === activeProfileId) {
+          // only switch if current active belongs to this profile's fetch; defer via timeout to avoid race
+          setActiveSessionId(mapped[0].id);
+        }
+      }
+    } catch {}
+  };
+
+  useEffect(() => {
+    if (activeProfileId) fetchThreads(activeProfileId);
+  }, [activeProfileId]);
+
+  // Ensure activeSessionId always belongs to the active profile
   useEffect(() => {
     const list = threads[activeProfileId];
     if (list && list.length > 0 && !list.some((t) => t.id === activeSessionId)) {
       setActiveSessionId(list[0].id);
     }
-  }, [activeProfileId]); // only re-align on profile change, not on every threads change to avoid clobbering new chat
-
-  // Persist threads
-  useEffect(() => {
-    localStorage.setItem('companion_threads', JSON.stringify(threads));
-  }, [threads]);
+  }, [activeProfileId]); // only on profile change
 
   // Fetch profiles from DB (persists across devices)
   useEffect(() => {
@@ -165,46 +170,45 @@ export default function App() {
   const handleProfileSelect = (profileId: string) => {
     setActiveProfileId(profileId);
     setMobileSidebarOpen(false);
-    const existingThreads = threads[profileId] || [];
-    if (existingThreads.length === 0) {
-      const newSid = `session_${Date.now()}`;
-      setThreads((prev) => ({
-        ...prev,
-        [profileId]: [{ id: newSid, title: 'New Conversation', createdAt: 'Just now' }]
-      }));
-      setActiveSessionId(newSid);
-    } else if (!existingThreads.some((t) => t.id === activeSessionId)) {
-      setActiveSessionId(existingThreads[0].id);
-    }
     setRefreshKey((k) => k + 1);
   };
 
-  const handleCreateNewChat = () => {
+  const handleCreateNewChat = async () => {
+    try {
+      const res = await fetch('/api/v1/threads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: activeProfile.id, title: 'New Conversation' })
+      });
+      if (res.ok) {
+        const t = await res.json();
+        const newThread: ChatThread = { id: t.id, title: t.title, createdAt: 'Just now' };
+        setThreads((prev) => ({ ...prev, [activeProfile.id]: [newThread, ...(prev[activeProfile.id] || [])] }));
+        setActiveSessionId(t.id);
+        setMobileSidebarOpen(false);
+        return;
+      }
+    } catch {}
+    // fallback local
     const newSid = `session_${Date.now()}`;
-    const newThread: ChatThread = {
-      id: newSid,
-      title: 'New Conversation',
-      createdAt: 'Just now'
-    };
-
-    setThreads((prev) => ({
-      ...prev,
-      [activeProfile.id]: [newThread, ...(prev[activeProfile.id] || [])]
-    }));
+    const newThread: ChatThread = { id: newSid, title: 'New Conversation', createdAt: 'Just now' };
+    setThreads((prev) => ({ ...prev, [activeProfile.id]: [newThread, ...(prev[activeProfile.id] || [])] }));
     setActiveSessionId(newSid);
     setMobileSidebarOpen(false);
   };
 
-  const handleDeleteThread = (e: React.MouseEvent, threadId: string) => {
+  const handleDeleteThread = async (e: React.MouseEvent, threadId: string) => {
     e.stopPropagation();
-    localStorage.removeItem(`chat_history_${activeProfile.id}_${threadId}`);
+    try {
+      await fetch(`/api/v1/threads/${threadId}?user_id=${encodeURIComponent(activeProfile.id)}`, { method: 'DELETE' });
+    } catch {}
     const remaining = profileThreads.filter((t) => t.id !== threadId);
-    setThreads((prev) => ({
-      ...prev,
-      [activeProfile.id]: remaining
-    }));
+    setThreads((prev) => ({ ...prev, [activeProfile.id]: remaining }));
     if (activeSessionId === threadId && remaining.length > 0) {
       setActiveSessionId(remaining[0].id);
+    } else if (remaining.length === 0) {
+      // auto-create will happen via fetchThreads next load; create one now
+      handleCreateNewChat();
     }
   };
 
@@ -261,19 +265,28 @@ export default function App() {
 
   const handleMemoryUpdate = () => {
     setRefreshKey((prev) => prev + 1);
+    // refresh thread list order (updated_at bumped)
+    fetchThreads(activeProfile.id);
   };
 
-  const handleUpdateThreadTitle = (title: string) => {
+  const handleUpdateThreadTitle = async (title: string) => {
+    // optimistic local update
     setThreads((prev) => {
       const list = prev[activeProfile.id] || [];
       const idx = list.findIndex((t) => t.id === activeSessionId);
       if (idx === -1) return prev;
-      // Don't overwrite if already named (not New Conversation)
       if (list[idx].title !== 'New Conversation') return prev;
       const updated = [...list];
       updated[idx] = { ...updated[idx], title };
       return { ...prev, [activeProfile.id]: updated };
     });
+    try {
+      await fetch(`/api/v1/threads/${activeSessionId}?user_id=${encodeURIComponent(activeProfile.id)}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title })
+      });
+    } catch {}
   };
 
   return (

@@ -4,7 +4,7 @@ from typing import AsyncGenerator, List, Dict, Any, Tuple, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from backend.app.config import get_settings
-from backend.app.models import Turn
+from backend.app.models import Turn, ChatThread
 from backend.app.schemas import MemoryManageRequest, ExtractedFact
 from backend.app.services.memory_service import MemoryService, memory_service, MemoryCapacityExceededError
 from backend.app.services.retrieval import retrieval_service
@@ -118,6 +118,23 @@ Respond authentically as Sam. Respect all current facts and NEVER contradict or 
             created_at=datetime.utcnow()
         )
         db.add(db_user_turn)
+        # ensure ChatThread exists / bump updated_at; auto-title from first message
+        try:
+            t_res = await db.execute(select(ChatThread).where(ChatThread.id == session_id, ChatThread.user_id == user_id))
+            thread = t_res.scalar_one_or_none()
+            if not thread:
+                title = user_message[:60].strip() + ("…" if len(user_message) > 60 else "")
+                if not title:
+                    title = "New Conversation"
+                thread = ChatThread(id=session_id, user_id=user_id, title=title)
+                db.add(thread)
+            else:
+                # auto-rename New Conversation on first user message
+                if thread.title == "New Conversation":
+                    thread.title = user_message[:60].strip() + ("…" if len(user_message) > 60 else "")
+                thread.updated_at = datetime.utcnow()
+        except Exception:
+            pass
         await db.commit()
 
         # Yield retrieved context metadata first
@@ -150,6 +167,14 @@ Respond authentically as Sam. Respect all current facts and NEVER contradict or 
             created_at=datetime.utcnow()
         )
         db.add(db_asst_turn)
+        # bump thread updated_at
+        try:
+            t_res2 = await db.execute(select(ChatThread).where(ChatThread.id == session_id, ChatThread.user_id == user_id))
+            th2 = t_res2.scalar_one_or_none()
+            if th2:
+                th2.updated_at = datetime.utcnow()
+        except Exception:
+            pass
         await db.commit()
 
         # 5. Post-Turn Extraction & Memory Invalidation / Additions

@@ -30,32 +30,41 @@ export const Chat: React.FC<ChatProps> = ({
 
   const { isStreaming, streamingContent, currentRetrievedFacts, error, streamMessage } = useSSE(onMemoryUpdate);
 
-  // Load or initialize welcome message when session/user changes
+  // Load history from DB (Turns)
   useEffect(() => {
-    const saved = localStorage.getItem(`chat_history_${userId}_${sessionId}`);
-    if (saved) {
+    let cancelled = false;
+    const load = async () => {
       try {
-        setMessages(JSON.parse(saved));
-        return;
-      } catch (e) {}
-    }
-
-    setMessages([
-      {
-        id: `welcome_${Date.now()}`,
-        role: 'assistant',
-        content: `Hey ${userName}! I'm Sam, your lifelong AI companion. I track our conversations with bi-temporal memory so I'll always remember your evolving preferences and never bring up outdated habits. What's on your mind?`,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        const res = await fetch(`/api/v1/threads/${encodeURIComponent(sessionId)}/turns?user_id=${encodeURIComponent(userId)}`);
+        if (res.ok) {
+          const turns: any[] = await res.json();
+          if (cancelled) return;
+          if (turns.length > 0) {
+            const mapped: Message[] = turns.map((t: any) => ({
+              id: t.id,
+              role: t.role as 'user' | 'assistant',
+              content: t.content,
+              timestamp: new Date(t.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            }));
+            setMessages(mapped);
+            return;
+          }
+        }
+      } catch {}
+      if (!cancelled) {
+        setMessages([
+          {
+            id: `welcome_${Date.now()}`,
+            role: 'assistant',
+            content: `Hey ${userName}! I'm Sam, your lifelong AI companion. I track our conversations with bi-temporal memory so I'll always remember your evolving preferences and never bring up outdated habits. What's on your mind?`,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          }
+        ]);
       }
-    ]);
+    };
+    load();
+    return () => { cancelled = true; };
   }, [userId, sessionId, userName]);
-
-  // Persist messages to localStorage per session
-  useEffect(() => {
-    if (messages.length > 0) {
-      localStorage.setItem(`chat_history_${userId}_${sessionId}`, JSON.stringify(messages));
-    }
-  }, [messages, userId, sessionId]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -171,8 +180,14 @@ export const Chat: React.FC<ChatProps> = ({
 
           <button
             onClick={() => {
-              localStorage.removeItem(`chat_history_${userId}_${sessionId}`);
-              setMessages([]);
+              setMessages([
+                {
+                  id: `welcome_${Date.now()}`,
+                  role: 'assistant',
+                  content: `Hey ${userName}! I'm Sam, your lifelong AI companion. I track our conversations with bi-temporal memory so I'll always remember your evolving preferences and never bring up outdated habits. What's on your mind?`,
+                  timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                }
+              ]);
             }}
             className="p-1.5 sm:p-2 text-muted hover:text-gray-200 hover:bg-border/50 rounded-xl transition"
             title="Clear Chat Thread"

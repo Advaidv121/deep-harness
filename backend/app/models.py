@@ -71,3 +71,16 @@ class Profile(Base):
     location = Column(String(256), nullable=False, default="Remote")
     avatar_bg = Column(String(64), nullable=False, default="from-amber-500 to-orange-600")
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+
+class ChatThread(Base):
+    __tablename__ = "chat_threads"
+
+    id = Column(String(64), primary_key=True)
+    user_id = Column(String(64), nullable=False, index=True)
+    title = Column(String(256), nullable=False, default="New Conversation")
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    __table_args__ = (
+        Index("ix_chat_threads_user_updated", "user_id", "updated_at"),
+    )

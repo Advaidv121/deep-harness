@@ -11,7 +11,8 @@ from backend.app.database import init_db, get_db
 from backend.app.schemas import (
     ChatMessageRequest, ChatMessageResponse, MemoryManageRequest,
     MemoryOperationResponse, MemorySnapshotResponse, FactResponse, TombstoneResponse,
-    ProfileCreate, ProfileResponse
+    ProfileCreate, ProfileResponse,
+    ChatThreadCreate, ChatThreadUpdate, ChatThreadResponse, TurnResponse
 )
 from backend.app.services.memory_service import memory_service, MemoryCapacityExceededError
 from backend.app.agent import companion_agent
@@ -165,6 +166,78 @@ async def seed_sample_profiles(user_id: str = "alex_prod", db: AsyncSession = De
         except Exception:
             pass
     return {"status": "ok", "seeded_user": user_id, "facts_added": len(created), "facts": created}
+
+# ─── Chat Threads & Turns (DB-backed, replaces localStorage) ───────────
+@app.get("/api/v1/threads", response_model=list[ChatThreadResponse], tags=["Chat"])
+async def list_threads(user_id: str, db: AsyncSession = Depends(get_db)):
+    from sqlalchemy import select
+    from backend.app.models import ChatThread
+    result = await db.execute(select(ChatThread).where(ChatThread.user_id == user_id).order_by(ChatThread.updated_at.desc()))
+    threads = result.scalars().all()
+    # Auto-seed one default thread if none exists (first visit)
+    if not threads:
+        import uuid
+        tid = f"chat_{user_id[:8]}_{uuid.uuid4().hex[:6]}" if len(user_id) > 8 else f"chat_{user_id}_1"
+        # keep stable default ids for demo profiles
+        defaults = {"alex_prod": "chat_main_1", "clara_orbital": "chat_clara_1", "maya_architect": "chat_maya_1"}
+        tid = defaults.get(user_id, tid)
+        titles = {"alex_prod": "Work Outage & Meditation", "clara_orbital": "Orbital Trajectory & Coffee", "maya_architect": "Chicago Studio & Kittens"}
+        t = ChatThread(id=tid, user_id=user_id, title=titles.get(user_id, "New Conversation"))
+        db.add(t)
+        await db.commit()
+        await db.refresh(t)
+        threads = [t]
+    return threads
+
+@app.post("/api/v1/threads", response_model=ChatThreadResponse, tags=["Chat"])
+async def create_thread(req: ChatThreadCreate, db: AsyncSession = Depends(get_db)):
+    import uuid
+    from backend.app.models import ChatThread
+    tid = req.id or f"session_{uuid.uuid4().hex[:8]}_{int(__import__('time').time())}"
+    tid = "".join(c if c.isalnum() or c in "_-" else "_" for c in tid)[:64]
+    thread = ChatThread(id=tid, user_id=req.user_id, title=req.title or "New Conversation")
+    db.add(thread)
+    await db.commit()
+    await db.refresh(thread)
+    return thread
+
+@app.patch("/api/v1/threads/{thread_id}", response_model=ChatThreadResponse, tags=["Chat"])
+async def update_thread(thread_id: str, req: ChatThreadUpdate, user_id: str, db: AsyncSession = Depends(get_db)):
+    from sqlalchemy import select
+    from backend.app.models import ChatThread
+    from datetime import datetime
+    result = await db.execute(select(ChatThread).where(ChatThread.id == thread_id, ChatThread.user_id == user_id))
+    thread = result.scalar_one_or_none()
+    if not thread:
+        raise HTTPException(status_code=404, detail="Thread not found")
+    thread.title = req.title
+    thread.updated_at = datetime.utcnow()
+    await db.commit()
+    await db.refresh(thread)
+    return thread
+
+@app.delete("/api/v1/threads/{thread_id}", tags=["Chat"])
+async def delete_thread(thread_id: str, user_id: str, db: AsyncSession = Depends(get_db)):
+    from sqlalchemy import select
+    from backend.app.models import ChatThread, Turn
+    result = await db.execute(select(ChatThread).where(ChatThread.id == thread_id, ChatThread.user_id == user_id))
+    thread = result.scalar_one_or_none()
+    if not thread:
+        raise HTTPException(status_code=404, detail="Thread not found")
+    await db.delete(thread)
+    # also delete turns for this session
+    t_res = await db.execute(select(Turn).where(Turn.session_id == thread_id, Turn.user_id == user_id))
+    for t in t_res.scalars().all():
+        await db.delete(t)
+    await db.commit()
+    return {"status": "deleted", "id": thread_id}
+
+@app.get("/api/v1/threads/{thread_id}/turns", response_model=list[TurnResponse], tags=["Chat"])
+async def list_turns(thread_id: str, user_id: str, db: AsyncSession = Depends(get_db)):
+    from sqlalchemy import select
+    from backend.app.models import Turn
+    result = await db.execute(select(Turn).where(Turn.session_id == thread_id, Turn.user_id == user_id).order_by(Turn.turn_index.asc()))
+    return result.scalars().all()
 
 @app.post("/api/v1/chat", response_model=ChatMessageResponse, tags=["Chat"])
 async def chat_sync(req: ChatMessageRequest, db: AsyncSession = Depends(get_db)):

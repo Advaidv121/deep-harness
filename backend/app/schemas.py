@@ -103,3 +103,30 @@ class ProfileResponse(BaseModel):
     created_at: datetime
 
     model_config = {"from_attributes": True}
+
+class ChatThreadCreate(BaseModel):
+    user_id: str
+    title: Optional[str] = "New Conversation"
+    id: Optional[str] = None
+
+class ChatThreadUpdate(BaseModel):
+    title: str = Field(..., min_length=1, max_length=256)
+
+class ChatThreadResponse(BaseModel):
+    id: str
+    user_id: str
+    title: str
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = {"from_attributes": True}
+
+class TurnResponse(BaseModel):
+    id: str
+    session_id: str
+    user_id: str
+    role: str
+    content: str
+    created_at: datetime
+
+    model_config = {"from_attributes": True}

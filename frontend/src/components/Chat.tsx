@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Bot, User, Sparkles, RefreshCw, AlertCircle, Database, BrainCircuit, ShieldCheck, ChevronDown, ChevronUp } from 'lucide-react';
+import { Send, Bot, User, Sparkles, RefreshCw, AlertCircle, Database, BrainCircuit, ShieldCheck, ChevronDown, ChevronUp, Menu } from 'lucide-react';
 import { Message, useSSE } from '../hooks/useSSE.ts';
 
 interface ChatProps {
@@ -9,6 +9,7 @@ interface ChatProps {
   onMemoryUpdate: () => void;
   onToggleInspector?: () => void;
   isInspectorOpen?: boolean;
+  onOpenMenu?: () => void;
 }
 
 export const Chat: React.FC<ChatProps> = ({
@@ -17,7 +18,8 @@ export const Chat: React.FC<ChatProps> = ({
   sessionId,
   onMemoryUpdate,
   onToggleInspector,
-  isInspectorOpen
+  isInspectorOpen,
+  onOpenMenu
 }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -108,33 +110,38 @@ export const Chat: React.FC<ChatProps> = ({
   ];
 
   return (
-    <div className="flex flex-col h-full bg-panel rounded-2xl border border-border overflow-hidden shadow-2xl">
+    <div className="flex flex-col h-full bg-panel rounded-xl lg:rounded-2xl border border-border overflow-hidden shadow-2xl">
       {/* Top Header */}
-      <div className="flex items-center justify-between px-6 py-3.5 border-b border-border bg-background/60 backdrop-blur">
-        <div className="flex items-center space-x-3.5">
-          <div className="relative">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-sky-500/20">
-              <Bot className="w-5 h-5 text-white" />
+      <div className="flex items-center justify-between px-3 sm:px-4 lg:px-6 py-2.5 sm:py-3.5 border-b border-border bg-background/60 backdrop-blur gap-2">
+        <div className="flex items-center gap-2 sm:gap-3.5 min-w-0">
+          {onOpenMenu && (
+            <button onClick={onOpenMenu} className="lg:hidden p-1.5 -ml-1 text-muted hover:text-white hover:bg-border/50 rounded-lg flex-shrink-0" aria-label="Open menu">
+              <Menu className="w-4 h-4" />
+            </button>
+          )}
+          <div className="relative flex-shrink-0">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-sky-500/20">
+              <Bot className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             </div>
-            <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 rounded-full ring-2 ring-panel" />
+            <span className="absolute bottom-0 right-0 w-2 sm:w-2.5 h-2 sm:h-2.5 bg-emerald-500 rounded-full ring-2 ring-panel" />
           </div>
-          <div>
-            <div className="flex items-center gap-2">
+          <div className="min-w-0">
+            <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
               <h2 className="font-semibold text-gray-100 text-sm">Sam</h2>
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              <span className="hidden xs:inline-flex sm:inline-flex items-center gap-1 px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                 <ShieldCheck className="w-3 h-3" />
                 Contradiction-Proof
               </span>
             </div>
-            <p className="text-[11px] text-muted">Chatting with <span className="text-gray-300 font-medium">{userName}</span> ({userId})</p>
+            <p className="text-[11px] text-muted truncate">Chatting with <span className="text-gray-300 font-medium">{userName}</span> <span className="hidden sm:inline">({userId})</span></p>
           </div>
         </div>
 
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
           {onToggleInspector && (
             <button
               onClick={onToggleInspector}
-              className={`px-3 py-1.5 rounded-xl text-xs font-medium border transition flex items-center gap-1.5 ${
+              className={`hidden lg:flex px-3 py-1.5 rounded-xl text-xs font-medium border transition items-center gap-1.5 ${
                 isInspectorOpen
                   ? 'bg-sky-500/15 border-sky-500/40 text-sky-400'
                   : 'bg-background hover:bg-border/60 border-border text-gray-300'
@@ -144,13 +151,22 @@ export const Chat: React.FC<ChatProps> = ({
               <span>Memory & Profile</span>
             </button>
           )}
+          {onToggleInspector && (
+            <button
+              onClick={onToggleInspector}
+              className={`lg:hidden p-2 rounded-xl border transition ${isInspectorOpen ? 'bg-sky-500/15 border-sky-500/30 text-sky-400' : 'bg-background border-border text-gray-400'}`}
+              title="Memory & Profile"
+            >
+              <BrainCircuit className="w-4 h-4" />
+            </button>
+          )}
 
           <button
             onClick={() => {
               localStorage.removeItem(`chat_history_${userId}_${sessionId}`);
               setMessages([]);
             }}
-            className="p-2 text-muted hover:text-gray-200 hover:bg-border/50 rounded-xl transition"
+            className="p-1.5 sm:p-2 text-muted hover:text-gray-200 hover:bg-border/50 rounded-xl transition"
             title="Clear Chat Thread"
           >
             <RefreshCw className="w-4 h-4" />
@@ -159,21 +175,21 @@ export const Chat: React.FC<ChatProps> = ({
       </div>
 
       {/* Messages Stream */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-5">
+      <div className="flex-1 overflow-y-auto p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-5">
         {messages.map((msg) => (
           <div
             key={msg.id}
-            className={`flex gap-3.5 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+            className={`flex gap-2 sm:gap-3.5 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             {msg.role === 'assistant' && (
-              <div className="w-8 h-8 rounded-full bg-sky-500/20 border border-sky-500/30 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <Bot className="w-4 h-4 text-sky-400" />
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-sky-500/20 border border-sky-500/30 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <Bot className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-sky-400" />
               </div>
             )}
 
-            <div className={`max-w-[80%] space-y-1.5`}>
+            <div className={`max-w-[88%] sm:max-w-[82%] lg:max-w-[80%] space-y-1.5`}>
               <div
-                className={`p-4 rounded-2xl text-sm leading-relaxed ${
+                className={`p-3 sm:p-4 rounded-2xl text-[13px] sm:text-sm leading-relaxed ${
                   msg.role === 'user'
                     ? 'bg-sky-600 text-white rounded-tr-none shadow-md shadow-sky-600/15'
                     : 'bg-background border border-border text-gray-200 rounded-tl-none shadow-sm'
@@ -232,8 +248,8 @@ export const Chat: React.FC<ChatProps> = ({
             </div>
 
             {msg.role === 'user' && (
-              <div className="w-8 h-8 rounded-full bg-indigo-600/30 border border-indigo-500/40 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <User className="w-4 h-4 text-indigo-300" />
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-indigo-600/30 border border-indigo-500/40 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-300" />
               </div>
             )}
           </div>
@@ -241,12 +257,12 @@ export const Chat: React.FC<ChatProps> = ({
 
         {/* Live Streaming Assistant Message */}
         {isStreaming && (
-          <div className="flex gap-3.5 justify-start">
-            <div className="w-8 h-8 rounded-full bg-sky-500/20 border border-sky-500/30 flex items-center justify-center flex-shrink-0 mt-0.5 animate-pulse">
-              <Bot className="w-4 h-4 text-sky-400" />
+          <div className="flex gap-2 sm:gap-3.5 justify-start">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-sky-500/20 border border-sky-500/30 flex items-center justify-center flex-shrink-0 mt-0.5 animate-pulse">
+              <Bot className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-sky-400" />
             </div>
-            <div className="max-w-[80%] space-y-1.5">
-              <div className="p-4 rounded-2xl text-sm leading-relaxed bg-background border border-border text-gray-200 rounded-tl-none shadow-sm">
+            <div className="max-w-[88%] sm:max-w-[82%] lg:max-w-[80%] space-y-1.5">
+              <div className="p-3 sm:p-4 rounded-2xl text-[13px] sm:text-sm leading-relaxed bg-background border border-border text-gray-200 rounded-tl-none shadow-sm">
                 <div className="whitespace-pre-wrap">{streamingContent || '...'}</div>
                 {currentRetrievedFacts.length > 0 && (
                   <div className="mt-3 pt-2.5 border-t border-border/60">
@@ -275,23 +291,23 @@ export const Chat: React.FC<ChatProps> = ({
       </div>
 
       {/* Quick Test Chips */}
-      <div className="px-6 py-2.5 bg-background/40 border-t border-border/50 flex flex-wrap gap-2 items-center">
-        <span className="text-[11px] text-muted font-medium mr-1">Quick Scenarios:</span>
+      <div className="px-3 sm:px-4 lg:px-6 py-2.5 bg-background/40 border-t border-border/50 flex gap-2 items-center overflow-x-auto scrollbar-thin whitespace-nowrap">
+        <span className="text-[11px] text-muted font-medium flex-shrink-0">Quick Scenarios:</span>
         {samplePrompts.map((p, idx) => (
           <button
             key={idx}
             onClick={() => handleSend(p.text)}
             disabled={isStreaming}
-            className="text-[11px] px-2.5 py-1 rounded-full bg-background hover:bg-border/60 text-gray-300 border border-border transition flex items-center gap-1.5 disabled:opacity-50"
+            className="flex-shrink-0 text-[11px] px-2.5 py-1 rounded-full bg-background hover:bg-border/60 text-gray-300 border border-border transition flex items-center gap-1.5 disabled:opacity-50"
           >
-            <Sparkles className="w-3 h-3 text-sky-400" />
+            <Sparkles className="w-3 h-3 text-sky-400 flex-shrink-0" />
             {p.label}
           </button>
         ))}
       </div>
 
       {/* Input Field */}
-      <div className="p-4 bg-background/70 border-t border-border backdrop-blur">
+      <div className="p-3 sm:p-4 bg-background/70 border-t border-border backdrop-blur">
         <div className="relative flex items-center">
           <textarea
             value={input}

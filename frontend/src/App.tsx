@@ -5,7 +5,10 @@ import {
   MessageSquare,
   Trash2,
   MapPin,
-  Briefcase
+  Briefcase,
+  Menu,
+  X,
+  PanelRightOpen
 } from 'lucide-react';
 import { Chat } from './components/Chat.tsx';
 import { MemoryPanel } from './components/MemoryPanel.tsx';
@@ -83,6 +86,7 @@ export default function App() {
 
   const [activeSessionId, setActiveSessionId] = useState<string>('chat_main_1');
   const [isInspectorOpen, setIsInspectorOpen] = useState<boolean>(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState<boolean>(false);
   const [refreshKey, setRefreshKey] = useState<number>(0);
   const [customUserModal, setCustomUserModal] = useState<boolean>(false);
   const [newUserName, setNewUserName] = useState<string>('');
@@ -145,6 +149,7 @@ export default function App() {
 
   const handleProfileSelect = (profileId: string) => {
     setActiveProfileId(profileId);
+    setMobileSidebarOpen(false);
     const existingThreads = threads[profileId] || [];
     if (existingThreads.length === 0) {
       const newSid = `session_${Date.now()}`;
@@ -172,6 +177,7 @@ export default function App() {
       [activeProfile.id]: [newThread, ...(prev[activeProfile.id] || [])]
     }));
     setActiveSessionId(newSid);
+    setMobileSidebarOpen(false);
   };
 
   const handleDeleteThread = (e: React.MouseEvent, threadId: string) => {
@@ -243,9 +249,66 @@ export default function App() {
   };
 
   return (
-    <div className="flex h-screen bg-background text-gray-100 overflow-hidden font-sans">
+    <div className="flex flex-col lg:flex-row h-[100dvh] lg:h-screen bg-background text-gray-100 overflow-hidden font-sans">
+      {/* Mobile top bar */}
+      <header className="flex lg:hidden items-center justify-between px-3 py-2.5 bg-panel border-b border-border flex-shrink-0">
+        <div className="flex items-center gap-2.5">
+          <button
+            onClick={() => setMobileSidebarOpen(true)}
+            className="p-2 -ml-1 text-gray-300 hover:text-white hover:bg-border/50 rounded-xl transition"
+            aria-label="Open menu"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center shadow-md shadow-sky-500/20">
+              <Cpu className="w-3.5 h-3.5 text-white" />
+            </div>
+            <span className="font-bold text-[11px] tracking-wider text-gray-100 uppercase">Deep Harness</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="hidden sm:inline text-[10px] text-muted truncate max-w-[110px]">{activeProfile.name}</span>
+          <button
+            onClick={() => setIsInspectorOpen(true)}
+            className={`p-2 rounded-xl border transition ${isInspectorOpen ? 'bg-sky-500/15 border-sky-500/30 text-sky-400' : 'bg-background border-border text-gray-400'}`}
+            aria-label="Open memory inspector"
+          >
+            <PanelRightOpen className="w-4 h-4" />
+          </button>
+        </div>
+      </header>
+
+      {/* Backdrop for mobile sidebar */}
+      {mobileSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+          onClick={() => setMobileSidebarOpen(false)}
+        />
+      )}
+      {/* Backdrop for mobile inspector */}
+      {isInspectorOpen && (
+        <div
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+          onClick={() => setIsInspectorOpen(false)}
+        />
+      )}
+
       {/* 1. Left Sidebar (Profiles & Chat History) */}
-      <aside className="w-72 bg-panel border-r border-border flex flex-col flex-shrink-0">
+      <aside
+        className={`bg-panel border-r border-border flex flex-col flex-shrink-0
+          lg:w-72 lg:h-full lg:static lg:translate-x-0
+          fixed inset-y-0 left-0 z-50 w-[82vw] max-w-[300px] h-[100dvh]
+          transform transition-transform duration-300 lg:flex
+          ${mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}
+      >
+        {/* Mobile close button row */}
+        <div className="flex lg:hidden items-center justify-between px-4 py-3 border-b border-border">
+          <span className="text-xs font-semibold text-gray-200">Menu</span>
+          <button onClick={() => setMobileSidebarOpen(false)} className="p-1.5 text-muted hover:text-white rounded-lg">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
         {/* App Branding */}
         <div className="h-14 px-4 border-b border-border flex items-center justify-between">
           <div className="flex items-center space-x-2.5">
@@ -346,7 +409,10 @@ export default function App() {
             profileThreads.map((th) => (
               <div
                 key={th.id}
-                onClick={() => setActiveSessionId(th.id)}
+                onClick={() => {
+                  setActiveSessionId(th.id);
+                  setMobileSidebarOpen(false);
+                }}
                 className={`group flex items-center justify-between p-2.5 rounded-xl text-xs cursor-pointer transition ${
                   activeSessionId === th.id
                     ? 'bg-sky-500/15 text-sky-300 border border-sky-500/30'
@@ -387,8 +453,8 @@ export default function App() {
       </aside>
 
       {/* 2. Main Chat View */}
-      <main className="flex-1 flex flex-col h-full overflow-hidden p-4 gap-4">
-        <div className="flex-1 h-full overflow-hidden">
+      <main className="flex-1 flex flex-col min-h-0 min-w-0 overflow-hidden p-2 sm:p-3 lg:p-4 gap-2 lg:gap-4">
+        <div className="flex-1 min-h-0 overflow-hidden">
           <Chat
             userId={activeProfile.id}
             userName={activeProfile.name}
@@ -396,13 +462,15 @@ export default function App() {
             onMemoryUpdate={handleMemoryUpdate}
             onToggleInspector={() => setIsInspectorOpen(!isInspectorOpen)}
             isInspectorOpen={isInspectorOpen}
+            onOpenMenu={() => setMobileSidebarOpen(true)}
           />
         </div>
       </main>
 
-      {/* 3. Collapsible Right Memory & Profile Inspector */}
+      {/* 3. Right Memory & Profile Inspector — drawer on mobile, sidebar on desktop */}
+      {/* Desktop inspector */}
       {isInspectorOpen && (
-        <aside className="w-96 p-4 pl-0 h-full overflow-hidden flex-shrink-0">
+        <aside className="hidden lg:flex w-96 p-4 pl-0 h-full overflow-hidden flex-shrink-0">
           <MemoryPanel
             refreshKey={refreshKey}
             userId={activeProfile.id}
@@ -410,7 +478,18 @@ export default function App() {
           />
         </aside>
       )}
-
+      {/* Mobile inspector drawer */}
+      <aside
+        className={`lg:hidden fixed inset-y-0 right-0 z-50 w-[92vw] max-w-[420px] h-[100dvh] p-3 transform transition-transform duration-300 ${
+          isInspectorOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}
+      >
+        <MemoryPanel
+          refreshKey={refreshKey}
+          userId={activeProfile.id}
+          onClose={() => setIsInspectorOpen(false)}
+        />
+      </aside>
       {/* Modal: Create Custom Profile */}
       {customUserModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">

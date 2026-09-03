@@ -128,9 +128,9 @@ export const MemoryPanel: React.FC<MemoryPanelProps> = ({ refreshKey, userId, on
   const getPercentage = (chars: number, max: number) => Math.min(100, Math.round((chars / max) * 100));
 
   return (
-    <div className="flex flex-col h-full bg-panel rounded-2xl border border-border overflow-hidden shadow-2xl">
+    <div className="flex flex-col h-full max-h-[100dvh] bg-panel rounded-xl lg:rounded-2xl border border-border overflow-hidden shadow-2xl">
       {/* Header */}
-      <div className="p-4 border-b border-border bg-background/50 space-y-3">
+      <div className="p-3 sm:p-4 border-b border-border bg-background/50 space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <div className="p-1.5 rounded-lg bg-sky-500/10 text-sky-400 border border-sky-500/20">

@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { Chat } from './components/Chat.tsx';
 import { MemoryPanel } from './components/MemoryPanel.tsx';
+import { Login } from './components/Login.tsx';
 
 interface Profile {
   id: string;
@@ -49,6 +50,14 @@ interface ChatThread {
 }
 
 export default function App() {
+  // ─── Auth state (must be declared before any conditional return) ──
+  const [authToken, setAuthToken] = useState<string | null>(() => {
+    return localStorage.getItem('dh_auth_token');
+  });
+  const [authDisplayName, setAuthDisplayName] = useState<string>(() => {
+    return localStorage.getItem('dh_auth_display_name') || '';
+  });
+
   const [profiles, setProfiles] = useState<Profile[]>(() => {
     const saved = localStorage.getItem('companion_profiles');
     return saved ? JSON.parse(saved) : DEFAULT_PROFILES;
@@ -83,6 +92,20 @@ export default function App() {
   const [newUserRole, setNewUserRole] = useState<string>('');
   const [newUserLocation, setNewUserLocation] = useState<string>('');
 
+  const handleLogin = (token: string, _username: string, displayName: string) => {
+    localStorage.setItem('dh_auth_token', token);
+    localStorage.setItem('dh_auth_display_name', displayName);
+    setAuthToken(token);
+    setAuthDisplayName(displayName);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('dh_auth_token');
+    localStorage.removeItem('dh_auth_display_name');
+    setAuthToken(null);
+    setAuthDisplayName('');
+  };
+
   const activeProfile = profiles.find((p) => p.id === activeProfileId) || profiles[0];
   const profileThreads = threads[activeProfile.id] || [];
 
@@ -95,6 +118,11 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem('companion_threads', JSON.stringify(threads));
   }, [threads]);
+
+  // ─── Auth gate: must be AFTER all hooks (Rules of Hooks) ───────
+  if (!authToken) {
+    return <Login onLogin={handleLogin} />;
+  }
 
   const handleProfileSelect = (profileId: string) => {
     setActiveProfileId(profileId);
@@ -187,6 +215,19 @@ export default function App() {
           <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
             v1.0
           </span>
+        </div>
+
+        {/* Logged in as */}
+        <div className="px-4 py-2 border-b border-border flex items-center justify-between text-[11px]">
+          <span className="text-muted">
+            Signed in as <span className="text-gray-300 font-medium">{authDisplayName}</span>
+          </span>
+          <button
+            onClick={handleLogout}
+            className="text-red-400 hover:text-red-300 transition text-[10px] font-medium"
+          >
+            Logout
+          </button>
         </div>
 
         {/* Profile Switcher Section */}

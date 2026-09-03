@@ -14,6 +14,7 @@ from backend.app.schemas import (
 )
 from backend.app.services.memory_service import memory_service, MemoryCapacityExceededError
 from backend.app.agent import companion_agent
+from backend.app.auth import authenticate, create_token, LoginRequest, LoginResponse, require_auth
 
 settings = get_settings()
 
@@ -32,6 +33,23 @@ app = FastAPI(title=settings.PROJECT_NAME, version=settings.VERSION, lifespan=li
 
 app.add_middleware(CORSMiddleware, allow_origins=settings.CORS_ORIGINS, allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 
+# ─── Auth routes (public) ───────────────────────────────────────────
+@app.post("/auth/login", response_model=LoginResponse, tags=["Auth"])
+async def login(req: LoginRequest):
+    user = authenticate(req.username, req.password)
+    token = create_token(req.username)
+    return LoginResponse(
+        token=token,
+        username=req.username,
+        display_name=user["display_name"],
+        role=user["role"],
+    )
+
+@app.get("/auth/me", tags=["Auth"])
+async def get_current_user(user=Depends(require_auth)):
+    return user
+
+# ─── Protected routes ───────────────────────────────────────────────
 @app.get("/api/v1/health", tags=["System"])
 async def health_check():
     return {"status": "ok", "service": settings.PROJECT_NAME, "version": settings.VERSION, "environment": settings.ENVIRONMENT}

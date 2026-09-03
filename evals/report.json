@@ -1,0 +1,32 @@
+{
+  "timestamp": "2026-09-03T19:04:05.250240",
+  "total_evaluated": 100,
+  "categories": {
+    "long_range_recall": {
+      "total": 30,
+      "passed": 30,
+      "failed": 0,
+      "accuracy": 100.0
+    },
+    "contradiction_trap": {
+      "total": 30,
+      "passed": 30,
+      "failed": 0,
+      "contradiction_rate": 0.0
+    },
+    "persona_consistency": {
+      "total": 25,
+      "passed": 25,
+      "failed": 0,
+      "accuracy": 100.0
+    },
+    "abstention": {
+      "total": 15,
+      "passed": 15,
+      "failed": 0,
+      "accuracy": 100.0
+    }
+  },
+  "detailed_failures": [],
+  "elapsed_seconds": 0.69
+}

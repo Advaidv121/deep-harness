@@ -1,0 +1,53 @@
+# Secrets & env
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+.aws/
+.aws-credentials
+
+# Databases & data
+data/*.db
+data/*.sqlite
+data/*.sqlite3
+*.db
+pg_data/
+qdrant_data/
+redis_data/
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+dist/
+build/
+*.log
+
+# Node
+frontend/node_modules/
+frontend/dist/
+node_modules/
+dist/
+.next/
+coverage/
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+*.code-workspace
+
+# Docker volumes (if local)
+docker-compose.override.yml

@@ -1,0 +1,871 @@
+{
+  "timestamp": "2026-09-03T17:38:20.274587+00:00",
+  "mode": "live",
+  "base_url": "http://localhost:8000",
+  "total": 100,
+  "elapsed_seconds": 440.2,
+  "summary": {
+    "long_range_recall": {
+      "total": 30,
+      "passed": 7,
+      "accuracy": 23.3
+    },
+    "contradiction_trap": {
+      "total": 30,
+      "passed": 0,
+      "accuracy": 0.0
+    },
+    "persona_consistency": {
+      "total": 25,
+      "passed": 0,
+      "accuracy": 0.0
+    },
+    "abstention": {
+      "total": 15,
+      "passed": 0,
+      "accuracy": 0.0
+    }
+  },
+  "failures": [
+    {
+      "id": "recall_004",
+      "category": "long_range_recall",
+      "passed": false,
+      "seconds": 59.7,
+      "detail": {
+        "response": "I remember that one, Alex. Your personal record in the half-marathon was 1 hour and 48 minutes, which you achieved in October 2025. That's a great time! Are you thinking of training for another race or trying to beat your current PR?",
+        "retrieved": [
+          "Completed half-marathon in October 2025 with a PR of 1h 48m"
+        ]
+      }
+    },
+    {
+      "id": "recall_009",
+      "category": "long_range_recall",
+      "passed": false,
+      "seconds": 18.8,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "recall_010",
+      "category": "long_range_recall",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "recall_011",
+      "category": "long_range_recall",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "recall_012",
+      "category": "long_range_recall",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "recall_013",
+      "category": "long_range_recall",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "recall_014",
+      "category": "long_range_recall",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "recall_015",
+      "category": "long_range_recall",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "recall_016",
+      "category": "long_range_recall",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "recall_017",
+      "category": "long_range_recall",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "recall_018",
+      "category": "long_range_recall",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "recall_019",
+      "category": "long_range_recall",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "recall_020",
+      "category": "long_range_recall",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "recall_021",
+      "category": "long_range_recall",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "recall_022",
+      "category": "long_range_recall",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "recall_023",
+      "category": "long_range_recall",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "recall_024",
+      "category": "long_range_recall",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "recall_025",
+      "category": "long_range_recall",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "recall_026",
+      "category": "long_range_recall",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "recall_027",
+      "category": "long_range_recall",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "recall_028",
+      "category": "long_range_recall",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "recall_029",
+      "category": "long_range_recall",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "recall_030",
+      "category": "long_range_recall",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "contradiction_001",
+      "category": "contradiction_trap",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "contradiction_002",
+      "category": "contradiction_trap",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "contradiction_003",
+      "category": "contradiction_trap",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "contradiction_004",
+      "category": "contradiction_trap",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "contradiction_005",
+      "category": "contradiction_trap",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "contradiction_006",
+      "category": "contradiction_trap",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "contradiction_007",
+      "category": "contradiction_trap",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "contradiction_008",
+      "category": "contradiction_trap",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "contradiction_009",
+      "category": "contradiction_trap",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "contradiction_010",
+      "category": "contradiction_trap",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "contradiction_011",
+      "category": "contradiction_trap",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "contradiction_012",
+      "category": "contradiction_trap",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "contradiction_013",
+      "category": "contradiction_trap",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "contradiction_014",
+      "category": "contradiction_trap",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "contradiction_015",
+      "category": "contradiction_trap",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "contradiction_016",
+      "category": "contradiction_trap",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "contradiction_017",
+      "category": "contradiction_trap",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "contradiction_018",
+      "category": "contradiction_trap",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "contradiction_019",
+      "category": "contradiction_trap",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "contradiction_020",
+      "category": "contradiction_trap",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "contradiction_021",
+      "category": "contradiction_trap",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "contradiction_022",
+      "category": "contradiction_trap",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "contradiction_023",
+      "category": "contradiction_trap",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "contradiction_024",
+      "category": "contradiction_trap",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "contradiction_025",
+      "category": "contradiction_trap",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "contradiction_026",
+      "category": "contradiction_trap",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "contradiction_027",
+      "category": "contradiction_trap",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "contradiction_028",
+      "category": "contradiction_trap",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "contradiction_029",
+      "category": "contradiction_trap",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "contradiction_030",
+      "category": "contradiction_trap",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "persona_001",
+      "category": "persona_consistency",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "persona_002",
+      "category": "persona_consistency",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "persona_003",
+      "category": "persona_consistency",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "persona_004",
+      "category": "persona_consistency",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "persona_005",
+      "category": "persona_consistency",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "persona_006",
+      "category": "persona_consistency",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "persona_007",
+      "category": "persona_consistency",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "persona_008",
+      "category": "persona_consistency",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "persona_009",
+      "category": "persona_consistency",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "persona_010",
+      "category": "persona_consistency",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "persona_011",
+      "category": "persona_consistency",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "persona_012",
+      "category": "persona_consistency",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "persona_013",
+      "category": "persona_consistency",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "persona_014",
+      "category": "persona_consistency",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "persona_015",
+      "category": "persona_consistency",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "persona_016",
+      "category": "persona_consistency",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "persona_017",
+      "category": "persona_consistency",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "persona_018",
+      "category": "persona_consistency",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "persona_019",
+      "category": "persona_consistency",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "persona_020",
+      "category": "persona_consistency",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "persona_021",
+      "category": "persona_consistency",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "persona_022",
+      "category": "persona_consistency",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "persona_023",
+      "category": "persona_consistency",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "persona_024",
+      "category": "persona_consistency",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "persona_025",
+      "category": "persona_consistency",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "abstention_001_abs",
+      "category": "abstention",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "abstention_002_abs",
+      "category": "abstention",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "abstention_003_abs",
+      "category": "abstention",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "abstention_004_abs",
+      "category": "abstention",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "abstention_005_abs",
+      "category": "abstention",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "abstention_006_abs",
+      "category": "abstention",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "abstention_007_abs",
+      "category": "abstention",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "abstention_008_abs",
+      "category": "abstention",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "abstention_009_abs",
+      "category": "abstention",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "abstention_010_abs",
+      "category": "abstention",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "abstention_011_abs",
+      "category": "abstention",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "abstention_012_abs",
+      "category": "abstention",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "abstention_013_abs",
+      "category": "abstention",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "abstention_014_abs",
+      "category": "abstention",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    },
+    {
+      "id": "abstention_015_abs",
+      "category": "abstention",
+      "passed": false,
+      "seconds": 0.0,
+      "detail": {
+        "error": "exception: RemoteDisconnected: Remote end closed connection without response"
+      }
+    }
+  ]
+}

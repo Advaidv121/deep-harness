@@ -1,0 +1,26 @@
+# SHARED MEMORY & CONTEXT (Bounded Snapshot: Max 2,200 chars)
+- [Project] Building a low-latency event-sourcing engine using Rust and SQLite.
+- [Health] Switched from double espresso to matcha green tea in mornings to improve sleep consistency.
+- [Milestone] Completed half-marathon in October 2025 with a personal record of 1h 48m.
+- [Travel] Planning a backpacking trip to Hokkaido in autumn.
+- [Routine] Takes Barnaby to Golden Gate Park on Saturday mornings.
+- works with Raft cluster and consensus state machine
+- had a sleep-deprived night
+- registered for a 30-day silent meditation retreat in Big Sur for December
+- has a morning caffeine routine
+- has a new health rule
+- Maya is a sustainable architect
+- Maya lives in Chicago
+- LOVES APPLE
+- Mom's name is Amitha
+- Works as Senior Distributed Systems Engineer on low-latency event sourcing engine
+- Lives in San Francisco, CA and hikes in Marin Headlands
+- Has a rescue golden retriever named Barnaby
+- Switched from double espresso to matcha green tea in mornings
+- Planning a backpacking trip to Hokkaido in autumn
+- Strictly avoiding refined sugar and syrups based on doctor lab results
+- Works as an orbital mechanics researcher in Denver, Colorado
+- - user is from Hydrabad
+- user works as a software engineer
+- user's tech stack includes python and react
+- user's mom's name is Amitha

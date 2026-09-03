@@ -1,0 +1,40 @@
+{
+  "timestamp": "2026-09-03T19:05:35.344388+00:00",
+  "mode": "live",
+  "base_url": "http://localhost:8000",
+  "total": 4,
+  "elapsed_seconds": 80.5,
+  "summary": {
+    "long_range_recall": {
+      "total": 1,
+      "passed": 1,
+      "accuracy": 100.0
+    },
+    "contradiction_trap": {
+      "total": 1,
+      "passed": 1,
+      "accuracy": 100.0
+    },
+    "persona_consistency": {
+      "total": 1,
+      "passed": 0,
+      "accuracy": 0.0
+    },
+    "abstention": {
+      "total": 1,
+      "passed": 1,
+      "accuracy": 100.0
+    }
+  },
+  "failures": [
+    {
+      "id": "persona_001",
+      "category": "persona_consistency",
+      "passed": false,
+      "seconds": 19.6,
+      "detail": {
+        "response": "It sounds like you're really drained, Alex. I can imagine how frustrating it must be to have everything break down at work. You know, after a long day of dealing with distributed systems and trying to troubleshoot issues, it's great that you've been prioritizing your sleep by switching to matcha gre"
+      }
+    }
+  ]
+}

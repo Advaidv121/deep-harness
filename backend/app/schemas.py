@@ -87,3 +87,19 @@ class ChatMessageResponse(BaseModel):
     retrieved_facts: List[str] = Field(default_factory=list)
     extracted_facts: List[ExtractedFact] = Field(default_factory=list)
     memory_updated: bool = False
+
+class ProfileCreate(BaseModel):
+    name: str = Field(..., min_length=1, max_length=128)
+    role: str = Field(default="Software Engineer", max_length=256)
+    location: str = Field(default="Remote", max_length=256)
+    avatar_bg: str = Field(default="from-amber-500 to-orange-600")
+
+class ProfileResponse(BaseModel):
+    id: str
+    name: str
+    role: str
+    location: str
+    avatar_bg: str
+    created_at: datetime
+
+    model_config = {"from_attributes": True}

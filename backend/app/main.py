@@ -10,7 +10,8 @@ from backend.app.config import get_settings
 from backend.app.database import init_db, get_db
 from backend.app.schemas import (
     ChatMessageRequest, ChatMessageResponse, MemoryManageRequest,
-    MemoryOperationResponse, MemorySnapshotResponse, FactResponse, TombstoneResponse
+    MemoryOperationResponse, MemorySnapshotResponse, FactResponse, TombstoneResponse,
+    ProfileCreate, ProfileResponse
 )
 from backend.app.services.memory_service import memory_service, MemoryCapacityExceededError
 from backend.app.agent import companion_agent
@@ -50,6 +51,41 @@ async def get_current_user(user=Depends(require_auth)):
     return user
 
 # ─── Protected routes ───────────────────────────────────────────────
+# Profiles (DB-backed, replaces localStorage-only)
+DEFAULT_PROFILES_SEED = [
+    {"id": "alex_prod", "name": "Alex", "role": "Senior Distributed Systems Engineer", "location": "San Francisco, CA", "avatar_bg": "from-sky-500 to-indigo-600"},
+    {"id": "clara_orbital", "name": "Clara", "role": "Orbital Mechanics Researcher", "location": "Tokyo / Denver", "avatar_bg": "from-purple-500 to-pink-600"},
+    {"id": "maya_architect", "name": "Maya", "role": "Sustainable Architect", "location": "Chicago, IL", "avatar_bg": "from-emerald-500 to-teal-600"},
+]
+
+@app.get("/api/v1/profiles", response_model=list[ProfileResponse], tags=["Profiles"])
+async def list_profiles(db: AsyncSession = Depends(get_db)):
+    from sqlalchemy import select
+    from backend.app.models import Profile
+    result = await db.execute(select(Profile).order_by(Profile.created_at))
+    profiles = result.scalars().all()
+    # Auto-seed defaults if table empty
+    if not profiles:
+        for p in DEFAULT_PROFILES_SEED:
+            db.add(Profile(**p))
+        await db.commit()
+        result = await db.execute(select(Profile).order_by(Profile.created_at))
+        profiles = result.scalars().all()
+    return profiles
+
+@app.post("/api/v1/profiles", response_model=ProfileResponse, tags=["Profiles"])
+async def create_profile(req: ProfileCreate, db: AsyncSession = Depends(get_db)):
+    import uuid
+    from backend.app.models import Profile
+    pid = f"user_{req.name.lower().replace(' ', '_').replace('-', '_')[:20]}_{uuid.uuid4().hex[:4]}"
+    # sanitize id
+    pid = "".join(c if c.isalnum() or c in "_-" else "_" for c in pid)
+    profile = Profile(id=pid, name=req.name.strip(), role=req.role.strip() or "Software Engineer", location=req.location.strip() or "Remote", avatar_bg=req.avatar_bg)
+    db.add(profile)
+    await db.commit()
+    await db.refresh(profile)
+    return profile
+
 @app.get("/api/v1/health", tags=["System"])
 async def health_check():
     return {"status": "ok", "service": settings.PROJECT_NAME, "version": settings.VERSION, "environment": settings.ENVIRONMENT}

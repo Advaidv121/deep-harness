@@ -58,10 +58,7 @@ export default function App() {
     return localStorage.getItem('dh_auth_display_name') || '';
   });
 
-  const [profiles, setProfiles] = useState<Profile[]>(() => {
-    const saved = localStorage.getItem('companion_profiles');
-    return saved ? JSON.parse(saved) : DEFAULT_PROFILES;
-  });
+  const [profiles, setProfiles] = useState<Profile[]>(DEFAULT_PROFILES);
 
   const [activeProfileId, setActiveProfileId] = useState<string>(() => {
     return localStorage.getItem('active_profile_id') || 'alex_prod';
@@ -119,6 +116,28 @@ export default function App() {
     localStorage.setItem('companion_threads', JSON.stringify(threads));
   }, [threads]);
 
+  // Fetch profiles from DB (persists across devices)
+  useEffect(() => {
+    if (!authToken) return;
+    fetch('/api/v1/profiles')
+      .then((r) => (r.ok ? r.json() : Promise.reject(r.statusText)))
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          const mapped: Profile[] = data.map((p: any) => ({
+            id: p.id,
+            name: p.name,
+            role: p.role,
+            location: p.location,
+            avatarBg: p.avatar_bg || 'from-amber-500 to-orange-600',
+          }));
+          setProfiles(mapped);
+        }
+      })
+      .catch(() => {
+        // fallback to defaults (already set)
+      });
+  }, [authToken]);
+
   // ─── Auth gate: must be AFTER all hooks (Rules of Hooks) ───────
   if (!authToken) {
     return <Login onLogin={handleLogin} />;
@@ -168,27 +187,55 @@ export default function App() {
     }
   };
 
-  const handleAddCustomProfile = (e: React.FormEvent) => {
+  const handleAddCustomProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newUserName.trim()) return;
 
-    const id = `user_${newUserName.toLowerCase().replace(/[^a-z0-9]/g, '_')}_${Date.now().toString().slice(-4)}`;
-    const newProf: Profile = {
-      id,
-      name: newUserName.trim(),
-      role: newUserRole.trim() || 'Software Engineer',
-      location: newUserLocation.trim() || 'Remote',
-      avatarBg: 'from-amber-500 to-orange-600'
-    };
-
-    setProfiles((prev) => [...prev, newProf]);
-    localStorage.setItem('companion_profiles', JSON.stringify([...profiles, newProf]));
-    setActiveProfileId(id);
-    setCustomUserModal(false);
-    setNewUserName('');
-    setNewUserRole('');
-    setNewUserLocation('');
-    handleProfileSelect(id);
+    try {
+      const res = await fetch('/api/v1/profiles', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: newUserName.trim(),
+          role: newUserRole.trim() || 'Software Engineer',
+          location: newUserLocation.trim() || 'Remote',
+        }),
+      });
+      if (!res.ok) throw new Error('Failed to create profile');
+      const created = await res.json();
+      const newProf: Profile = {
+        id: created.id,
+        name: created.name,
+        role: created.role,
+        location: created.location,
+        avatarBg: created.avatar_bg || 'from-amber-500 to-orange-600',
+      };
+      setProfiles((prev) => [...prev, newProf]);
+      setActiveProfileId(newProf.id);
+      setCustomUserModal(false);
+      setNewUserName('');
+      setNewUserRole('');
+      setNewUserLocation('');
+      handleProfileSelect(newProf.id);
+    } catch (err) {
+      console.error('Create profile failed', err);
+      // fallback: local add if backend unreachable
+      const id = `user_${newUserName.toLowerCase().replace(/[^a-z0-9]/g, '_')}_${Date.now().toString().slice(-4)}`;
+      const newProf: Profile = {
+        id,
+        name: newUserName.trim(),
+        role: newUserRole.trim() || 'Software Engineer',
+        location: newUserLocation.trim() || 'Remote',
+        avatarBg: 'from-amber-500 to-orange-600',
+      };
+      setProfiles((prev) => [...prev, newProf]);
+      setActiveProfileId(id);
+      setCustomUserModal(false);
+      setNewUserName('');
+      setNewUserRole('');
+      setNewUserLocation('');
+      handleProfileSelect(id);
+    }
   };
 
   const handleMemoryUpdate = () => {

@@ -61,3 +61,13 @@ class Turn(Base):
     __table_args__ = (
         Index("ix_turns_session_turn", "session_id", "turn_index"),
     )
+
+class Profile(Base):
+    __tablename__ = "profiles"
+
+    id = Column(String(64), primary_key=True)
+    name = Column(String(128), nullable=False)
+    role = Column(String(256), nullable=False, default="Software Engineer")
+    location = Column(String(256), nullable=False, default="Remote")
+    avatar_bg = Column(String(64), nullable=False, default="from-amber-500 to-orange-600")
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)

@@ -422,7 +422,7 @@ export default function App() {
           <div className="flex items-center justify-between text-[11px] text-muted font-medium px-1">
             <span>ACTIVE PROFILE</span>
             <button
-              onClick={() => setCustomUserModal(true)}
+              onClick={() => { setMobileSidebarOpen(false); setCustomUserModal(true); }}
               className="text-sky-400 hover:text-sky-300 transition flex items-center gap-0.5"
             >
               <Plus className="w-3 h-3" />
@@ -570,14 +570,14 @@ export default function App() {
       </aside>
       {/* Modal: Create Custom Profile */}
       {customUserModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-panel border border-border rounded-2xl w-full max-w-md p-6 space-y-4 shadow-2xl">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
+          <div className="bg-panel border border-border rounded-2xl w-full max-w-md p-6 space-y-4 shadow-2xl" onClick={e => e.stopPropagation()}>
             <h3 className="font-semibold text-base text-gray-100">Create New User Profile</h3>
             <p className="text-xs text-muted">
               Creates a dedicated profile with isolated bi-temporal facts, distinct memory bounds, and zero cross-talk.
             </p>
 
-            <form onSubmit={handleAddCustomProfile} className="space-y-3 text-xs">
+            <form onSubmit={handleAddCustomProfile} className="space-y-3 text-xs" style={{ touchAction: 'manipulation' }}>
               <div>
                 <label className="block text-muted font-medium mb-1">Full Name</label>
                 <input

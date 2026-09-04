@@ -79,6 +79,12 @@ async def list_profiles(db: AsyncSession = Depends(get_db)):
 async def create_profile(req: ProfileCreate, db: AsyncSession = Depends(get_db)):
     import uuid
     from backend.app.models import Profile
+    from sqlalchemy import select
+    # Dedup: return existing profile if name already exists
+    existing = await db.execute(select(Profile).where(Profile.name == req.name.strip()))
+    existing_prof = existing.scalar_one_or_none()
+    if existing_prof:
+        return existing_prof
     pid = f"user_{req.name.lower().replace(' ', '_').replace('-', '_')[:20]}_{uuid.uuid4().hex[:4]}"
     # sanitize id
     pid = "".join(c if c.isalnum() or c in "_-" else "_" for c in pid)
